@@ -1,18 +1,9 @@
+<!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useAppConfig } from '#imports'
 
-const appConfig = useAppConfig() as {
-  nuxtIcon: {
-    size?: string
-    class?: string
-    aliases?: Record<string, string>
-    iconifyApiOptions?: {
-      url?: string
-      publicApiFallback?: boolean
-    }
-  }
-}
+const appConfig = useAppConfig()
 
 const props = defineProps({
   name: {
@@ -26,40 +17,21 @@ const props = defineProps({
 })
 
 const iconName = computed(() => {
-  if (appConfig.nuxtIcon.aliases && appConfig.nuxtIcon.aliases[props.name]) {
-    return appConfig.nuxtIcon.aliases[props.name].replace(/^i-/, '')
-  }
-
-  return props.name.replace(/^i-/, '')
-})
-const iconUrl = computed(() => {
-  const customUrl = appConfig.nuxtIcon?.iconifyApiOptions?.url
-
-  if (customUrl) {
-    // validate the custom Iconify API URL
-    try {
-      new URL(customUrl)
-    } catch (e) {
-      console.warn('Nuxt IconCSS: Invalid custom Iconify API URL')
-      return
-    }
-  }
-
-  const baseUrl = customUrl || 'https://api.iconify.design'
-
-  return `url('${baseUrl}/${iconName.value.replace(':', '/')}.svg')`
-})
+  const aliases = appConfig.nuxtIcon?.aliases as Record<string, string> || {};
+  return (aliases[props.name] || props.name).replace(/^i-/, '');
+});
+const iconUrl = computed(() => `url('https://api.iconify.design/${iconName.value.replace(':', '/')}.svg')`);
 const sSize = computed(() => {
   // Disable size if appConfig.nuxtIcon.size === false
   if (!props.size && typeof appConfig.nuxtIcon?.size === 'boolean' && !appConfig.nuxtIcon?.size) {
-    return undefined
+    return undefined;
   }
-  const size = props.size || appConfig.nuxtIcon?.size || '1em'
+  const size = props.size || appConfig.nuxtIcon?.size || '1em';
   if (String(Number(size)) === size) {
-    return `${size}px`
+    return `${size}px`;
   }
-  return size
-})
+  return size;
+});
 </script>
 
 <template>
